@@ -12,42 +12,46 @@ const { Band, Musician } = require('./db/models');
 // Express using json - DO NOT MODIFY
 app.use(express.json());
 
-
 // STEP 1: Order by one attribute
 // Get all bands, ordered by createdAt, latest first
 app.get('/bands/latest', async (req, res, next) => {
-    const bands = await Band.findAll({ 
-        // Your code here
-    });
-    res.json(bands);
-})
+  const bands = await Band.findAll({
+    // Your code here
+    attributes: ['name'],
+    order: [['createdAt', 'DESC']],
+  });
+  res.json(bands);
+});
 
 // STEP 2: Order by multiple attributes
 // Get all musicians, ordered by last name, then first name, alphabetically
 app.get('/musicians/alphabetic', async (req, res, next) => {
-    const musicians = await Musician.findAll({ 
-        // Your code here
-    });
-    res.json(musicians);
-})
+  const musicians = await Musician.findAll({
+    // Your code here
+    attributes: ['firstName', 'lastName'],
+    order: [['lastName'], ['firstName']],
+  });
+  res.json(musicians);
+});
 
 // STEP 3: Order by multiple attributes, including nested attributes
-// Get bands and associated musicians, ordered by band name, then musician last 
+// Get bands and associated musicians, ordered by band name, then musician last
 // name, then first name, alphabetically
 app.get('/bands/alphabetic-musicians', async (req, res, next) => {
-    const bands = await Band.findAll({ 
-        include: { model: Musician }, 
-        // Your code here
-    })
-    res.json(bands);
-})
-
+  const bands = await Band.findAll({
+    attributes: ['name'],
+    include: { model: Musician, attributes: ['firstName', 'lastName'] },
+    // Your code here
+    order: [['name'], [Musician, 'lastName'], [Musician, 'firstName']],
+  });
+  res.json(bands);
+});
 
 // Root route - DO NOT MODIFY
 app.get('/', (req, res) => {
-    res.json({
-        message: "API server is running"
-    });
+  res.json({
+    message: 'API server is running',
+  });
 });
 
 // Set port and listen for incoming requests - DO NOT MODIFY
